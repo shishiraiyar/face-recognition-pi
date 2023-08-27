@@ -1,4 +1,5 @@
 import socketio
+from threading import Thread
 
 # Create a SocketIO client instance
 sio = socketio.Client()
@@ -16,7 +17,7 @@ def handle_event2(data):
 
 # Connect to the server
 
-sio.connect('http://your_server_ip:your_server_port')
+sio.connect('https://facerecognitionpi.onrender.com/')
 
 sio.emit("identify", "pi")
 
@@ -25,5 +26,10 @@ sio.emit('intruderDetected')
 
 
 # Keep the client running
-sio.wait()
+def threadFunc():
+    sio.wait()
+
+t = Thread(target=threadFunc)
+t.start()
+
 print("lolol")
