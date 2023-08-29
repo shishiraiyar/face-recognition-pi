@@ -27,14 +27,14 @@ def takePic():
 
 
 def encodeKnownFaces():
-    global knownFaces  
+    global knownFaces, names
     # get the path/directory
     folder_dir = "./known" 
     for image in os.listdir(folder_dir):
         if (image.endswith(".jpeg")):
             image = image.split(".")[0]
             print(f"Loading face of {image}")
-            encoding = face_recognition.face_encodings(image)[0]
+            encoding = face_recognition.face_encodings(face_recognition.load_image_file(folder_dir + "/" + image))[0]
             names.append(image)
             knownFaces.append(encoding)
 
@@ -45,6 +45,7 @@ def encodeKnownFaces():
 # But since I know each image only has one face, I only care about the first encoding in each image, so I grab index 0.
 
 def faceRecognition(unknownImage):
+    global knownFaces, names
     # -1 No face
     # 0 Allowed
     # 1 Thief
