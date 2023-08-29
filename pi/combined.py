@@ -8,72 +8,70 @@ import os
 from os import listdir
 
 camera = None
+knownFaces = []
+names = []
+
 def camInit():
     global camera
-    # Create the in-memory stream
     camera = PiCamera() #takes time 
     camera.start_preview()
-    sleep(2) 
+    sleep(1) 
 
 def takePic():
     global camera 
-    #while starts here 
-    camera.capture(stream, format='jpeg', resize=(500,500))
-    # "Rewind" the stream to the beginning so we can read its content
     stream = BytesIO()
+    camera.capture(stream, format='jpeg', resize=(500,500))    
     stream.seek(0)
     image = Image.open(stream)
     return image
-    # image.save("test.jpeg")
-    #delay of some 5 seconds
 
-knownFaces = []
-def knownEncoding():
+
+def encodeKnownFaces():
     global knownFaces  
     # get the path/directory
     folder_dir = "./known" 
-    for images in os.listdir(folder_dir):
-	# check if the image ends with png
-        if (images.endswith(".jpeg")):
-            # print(images)
-            encoding = face_recognition.face_encodings(images)[0]
+    for image in os.listdir(folder_dir):
+        if (image.endswith(".jpeg")):
+            image = image.split(".")[0]
+            print(f"Loading face of {image}")
+            encoding = face_recognition.face_encodings(image)[0]
+            names.append(image)
             knownFaces.append(encoding)
 
-# Load the jpg files into numpy arrays
-# obama_image = face_recognition.load_image_file("./known/jk1")
-# justin_image = face_recognition.load_image_file("./known/trump")
 
-# unknown_image = face_recognition.load_image_file("./unknown/jk2")
 
 # Get the face encodings for each face in each image file
 # Since there could be more than one face in each image, it returns a list of encodings.
 # But since I know each image only has one face, I only care about the first encoding in each image, so I grab index 0.
-unknown_image = np.array(takePic())
-try:
-    # obama_face_encoding = face_recognition.face_encodings(obama_image)[0]
-    # justin_face_encoding = face_recognition.face_encodings(justin_image)[0]
-    unknown_face_encoding = face_recognition.face_encodings(unknown_image)[0]
-except IndexError:
-    print("I wasn't able to locate any faces in at least one of the images. Check the image files. Aborting...")
-    quit()
 
-# known_faces = [
-#     obama_face_encoding,
-#     justin_face_encoding,
+def faceRecognition(unknownImage):
+    # -1 No face
+    # 0 Allowed
+    # 1 Thief
+    unknownImage = np.array(unknownImage)
+    unknownFaceencodings = face_recognition.face_encodings(unknownImage)
 
-# ]
+    if (len(unknownFaceencodings) == 0):
+        print("No face")
+        return -1
 
-# results is an array of True/False telling if the unknown face matched anyone in the known_faces array
-results = face_recognition.compare_faces(knownFaces, unknown_face_encoding)
-i=1
-seen=False
-for res in results:
-    print("Is the unknown face a picture of known{}? {}".format(i, res))
-    if(res):
-        seen=True
-    i+=1
-    # print("Is the unknown face a picture of Justin? {}".format(results[1]))
-if(not seen):
-    print("Is the unknown face a new person that we've never seen before? {}".format(not True in results))
+    results = face_recognition.compare_faces(knownFaces, unknownFaceencodings[0])
+    # results is an array of True/False telling if the unknown face matched anyone in the known_faces array
+    for i in range(len(results)):
+        if results[i]:
+            print(f"My name is {names[i]}")
+            return 0
+    print("I am a thief hehehehehe")
+
+    return 1
+
+
+if __name__ == "__main__":
+    print("Initialising")
+    camInit()
+    encodeKnownFaces()
+    print("Get ready to take pic")
+    img = takePic()
+    faceRecognition(img)
 
 
