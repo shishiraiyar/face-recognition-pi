@@ -6,6 +6,7 @@ from PIL import Image
 import numpy as np
 import os
 from os import listdir
+import pickle
 
 camera = None
 knownFaces = []
@@ -34,11 +35,27 @@ def encodeKnownFaces():
         if (image.endswith(".jpeg")):
             image = image.split(".")[0]
             print(f"Loading face of {image}")
-            encoding = face_recognition.face_encodings(face_recognition.load_image_file(folder_dir + "/" + image))[0]
+            encoding = face_recognition.face_encodings(face_recognition.load_image_file(folder_dir + "/" + image), num_jitters=10)[0]
             names.append(image)
             knownFaces.append(encoding)
 
+def storeEncodingsToFile():
+    global names, knownFaces
+    allFaceEncodings = {}
+    for i in range(len(names)):
+        allFaceEncodings[names[i]] = knownFaces[i]
+    
+    with open('dataset.dat', 'wb') as f:
+        pickle.dump(allFaceEncodings, f)
 
+def loadEncodingsFromFile():
+    with open('dataset.dat', 'rb') as f:
+        allFaceEncodings = pickle.load(f)
+            
+    names = list(allFaceEncodings.keys())
+    encodings = np.array(list(allFaceEncodings.values()))
+
+    return names, encodings
 
 # Get the face encodings for each face in each image file
 # Since there could be more than one face in each image, it returns a list of encodings.
@@ -70,7 +87,9 @@ def faceRecognition(unknownImage):
 if __name__ == "__main__":
     print("Initialising")
     camInit()
-    encodeKnownFaces()
+    encodeKnownFaces()      #COMMENT THIS after first time
+    storeEncodingsToFile()  #COMMENT THIS after first time
+    names, knownFaces = loadEncodingsFromFile()
     print("Get ready to take pic")
     img = takePic()
     faceRecognition(img)
