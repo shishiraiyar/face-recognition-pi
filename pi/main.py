@@ -19,11 +19,12 @@ def handle_event2(data):
 
 # Connect to the server
 
-sio.connect('https://facerecognitionpi.onrender.com/')
+# sio.connect('https://facerecognitionpi.onrender.com/')
+sio.connect('192.168.106.108:5000')
+
 sio.emit("identify", "pi")
 
 
-sio.emit('intruderDetected')
 
 # Keep the client running
 def threadFunc():
@@ -55,7 +56,7 @@ while(True):
         continue
 
     else:
-        sio.emit('log',  f"{retVal} has entered the house at {str(curTime)}")
+        sio.emit('log',  f"{retVal} has entered the house at {curTime:%Y-%m-%d %H:%M}")
         # Unlock door
 
 

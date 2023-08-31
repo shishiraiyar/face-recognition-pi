@@ -45,7 +45,7 @@ class FaceRecognition:
             print("No face")
             return -1
 
-        results = face_recognition.compare_faces(self.knownFaces, unknownFaceencodings[0])
+        results = face_recognition.compare_faces(self.knownFaces, unknownFaceencodings[0], tolerance=0.5)
         for i in range(len(results)):
             if results[i]:
                 print(f"My name is {self.names[i]}")
