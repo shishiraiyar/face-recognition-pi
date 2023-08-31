@@ -34,6 +34,9 @@ def handleIntruder():
     emit("showConsole", "KALLAN KALLAN oodi Vaa KALLANN", room=connections["browser"])
     pass
 
+@socketio.on('log')
+def handleLog(string):
+    emit('showConsole', string, room=connections['browser'])
 
 
 if __name__ == "__main__":

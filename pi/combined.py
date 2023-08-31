@@ -5,7 +5,6 @@ from picamera import PiCamera
 from PIL import Image
 import numpy as np
 import os
-from os import listdir
 import pickle
 
 camera = None
