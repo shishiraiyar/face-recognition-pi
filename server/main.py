@@ -33,7 +33,7 @@ def handleBaton():
 @socketio.on("intruderDetected")
 def handleIntruder():
     print("AYYOOO KALLLAAA")
-    emit("showConsole", "KALLAN KALLAN oodi Vaa KALLANN", room=connections["browser"])
+    emit("showConsole", "Intruder detected. Do you know them?", room=connections["browser"])
     pass
 
 @socketio.on('log')
