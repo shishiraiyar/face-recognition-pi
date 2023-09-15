@@ -19,10 +19,26 @@
     
     padding:10px;
   
-  }
+}
   
-  .errorMsg{
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-  
+.errorMsg{
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+
+.wrapper{
+  text-align: center;
+
+}
+
+#unlockImage{
+  width: 20%;
+}
+#housePicture{
+  width: 20%;
+}
+
+body{
+  background-color: #FFB7B7;
+}

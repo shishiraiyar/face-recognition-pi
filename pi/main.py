@@ -3,9 +3,11 @@ from threading import Thread
 from datetime import datetime
 from time import sleep
 from FaceRecognition import Camera, FaceRecognition
+import io
+import requests
 
 sio = socketio.Client()
-
+server_url = '192.168.106.108:5000'
 # Define the event handlers
 @sio.on('unlockDoor')
 def unlockDoor():
@@ -20,7 +22,7 @@ def handle_event2(data):
 # Connect to the server
 
 # sio.connect('https://facerecognitionpi.onrender.com/')
-sio.connect('192.168.106.108:5000')
+sio.connect(server_url)
 
 sio.emit("identify", "pi")
 
@@ -46,6 +48,8 @@ while(True):
     print("Taking picture")
     sleep(1)
     img = cam.takePic()
+
+
     retVal = fr.checkFace(img)
     curTime = datetime.now()
     if (retVal == -1):
@@ -53,6 +57,13 @@ while(True):
     
     elif (retVal == 1):
         sio.emit("intruderDetected")
+        img_byte_array = io.BytesIO()
+        img.save(img_byte_array, format='JPEG')
+        image_bytes = img_byte_array.getvalue()
+        files = {'image': ('image.jpg', image_bytes)}
+        response = requests.post(server_url + "/housePicture", files=files)
+        sio.emit("updateImage")
+        
         continue
 
     else:
@@ -61,3 +72,16 @@ while(True):
 
 
     
+
+
+# img_byte_array = io.BytesIO()
+# img.save(img_byte_array, format='JPEG')
+# image_bytes = img_byte_array.getvalue()
+# files = {'image': ('image.jpg', image_bytes)}
+
+# print("Encoded")
+# sio.emit("intruderDetected")
+
+
+# print("SENT")
+        
